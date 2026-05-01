@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Systems Monday Municipal Recorder</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: system-ui, sans-serif;
+      background: #0f172a;
+      color: #e5e7eb;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+    header {
+      padding: 12px 18px;
+      border-bottom: 1px solid #1f2937;
+      background: #020617;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    header h1 {
+      margin: 0;
+      font-size: 16px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+    #liveClock {
+      font-size: 14px;
+      color: #38bdf8;
+      font-weight: 600;
+    }
+    main {
+      flex: 1;
+      display: flex;
+      gap: 12px;
+      padding: 12px;
+    }
+    .left {
+      flex: 2.2;
+      background: #020617;
+      border-radius: 12px;
+      border: 1px solid #1f2937;
+      padding: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      box-shadow: 0 18px 40px rgba(0,0,0,0.6);
+    }
+    .right {
+      flex: 1;
+      background: #020617;
+      border-radius: 12px;
+      border: 1px solid #1f2937;
+      padding: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      box-shadow: 0 18px 40px rgba(0,0,0,0.6);
+    }
+    h2 {
+      margin: 0;
+      font-size: 13px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: #cbd5f5;
+    }
+    .hint {
+      font-size: 11px;
+      color: #9ca3af;
+    }
+    textarea {
+      width: 100%;
+      height: 260px;
+      resize: vertical;
+      background: #020617;
+      border-radius: 8px;
+      border: 1px solid #374151;
+      padding: 8px;
+      color: #e5e7eb;
+      font-size: 13px;
+      line-height: 1.4;
+      outline: none;
+    }
+    textarea:focus {
+      border-color: #38bdf8;
+      box-shadow: 0 0 0 1px rgba(56,189,248,0.4);
+    }
+    .controls {
+      display: flex;
+      gap: 8px;
+      margin-top: 4px;
+      flex-wrap: wrap;
+    }
+    .marker-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 6px;
+    }
+    button {
+      border-radius: 999px;
+      border: 1px solid #4b5563;
+      background: #020617;
+      color: #e5e7eb;
+      font-size: 11px;
+      padding: 6px 12px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+    button.primary {
+      border-color: #38bdf8;
+      background: #0ea5e9;
+      color: #0b1120;
+      font-weight: 600;
+    }
+    button.marker {
+      border-color: #6b7280;
+      background: #111827;
+      font-size: 10px;
+      padding: 4px 10px;
+    }
+    .log {
+      flex: 1;
+      border-radius: 8px;
+      border: 1px solid #374151;
+      background: #020617;
+      padding: 8px;
+      overflow-y: auto;
+      font-size: 12px;
+    }
+    .log-entry {
+      padding: 6px 8px;
+      border-radius: 6px;
+      border: 1px solid #1f2937;
+      background: #020617;
+      margin-bottom: 6px;
+    }
+    .log-time {
+      font-size: 11px;
+      color: #9ca3af;
+      margin-bottom: 2px;
+    }
+    .log-text {
+      font-size: 12px;
+      color: #e5e7eb;
+      white-space: pre-wrap;
+    }
+    .log-marker {
+      font-size: 11px;
+      color: #facc15;
+      font-weight: 600;
+      margin-bottom: 2px;
+    }
+    footer {
+      padding: 8px 12px;
+      font-size: 11px;
+      color: #9ca3af;
+      border-top: 1px solid #1f2937;
+      background: #020617;
+      display: flex;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+  </style>
+</head>
+
+<body>
+  <header>
+    <h1>Systems Monday Municipal Recorder</h1>
+    <div id="liveClock">Loading time...</div>
+  </header>
+
+  <main>
+    <section class="left">
+      <h2>Type Notes Here</h2>
+      <div class="hint">
+        Press <strong>Ctrl + Enter</strong> or click <strong>Timestamp</strong> to log the previous note and start a new timestamp.
+      </div>
+
+      <textarea id="noteInput" placeholder="Type your notes here..."></textarea>
+
+      <div class="controls">
+        <button class="primary" id="timestampButton">Timestamp</button>
+        <button id="resetButton">Reset Log</button>
+        <button id="exportButton">Export CSV</button>
+      </div>
+
+      <div class="marker-row">
+        <span class="hint">Markers:</span>
+        <button class="marker" data-marker="Action Item">Action Item</button>
+        <button class="marker" data-marker="Decision">Decision</button>
+        <button class="marker" data-marker="Follow-Up">Follow‑Up</button>
+        <button class="marker" data-marker="Issue">Issue</button>
+        <button class="marker" data-marker="Highlight">Highlight</button>
+      </div>
+    </section>
+
+    <section class="right">
+      <h2>Timestamped Notes</h2>
+      <div class="hint">Each timestamp, note, and marker appears here.</div>
+      <div id="logContainer" class="log"></div>
+    </section>
+  </main>
+
+  <footer>
+    <span>Ctrl+Enter = timestamp + log note</span>
+    <span>Markers = quick flags (Action, Decision, Follow‑Up, Issue, Highlight)</span>
+    <span>Right log auto‑saves; left note area stays fresh</span>
+  </footer>
+
+  <script>
+    /* ---------------- LIVE CLOCK ---------------- */
+    function updateClock() {
+      const now = new Date();
+      const timeString = now.toLocaleTimeString([], {
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit'
+      });
+      document.getElementById("liveClock").textContent = "Current Time: " + timeString;
+    }
+    setInterval(updateClock, 1000);
+    updateClock();
+
+    /* ---------------- ELEMENTS ---------------- */
+    const noteInput = document.getElementById("noteInput");
+    const logContainer = document.getElementById("logContainer");
+    const timestampButton = document.getElementById("timestampButton");
+    const resetButton = document.getElementById("resetButton");
+    const exportButton = document.getElementById("exportButton");
+    const markerButtons = document.querySelectorAll("button.marker");
+
+    let logData = [];
+    let pendingTimestamp = null;
+
+    /* ---------------- AUTO-RESTORE ---------------- */
+    function restoreLog() {
+      const saved = localStorage.getItem("savedLogData");
+      if (saved) {
+        logData = JSON.parse(saved);
+        logData.forEach(entry => {
+          addEntryToDOM(entry);
+        });
+
+        const savedScroll = localStorage.getItem("savedLogScroll");
+        if (savedScroll !== null) {
+          logContainer.scrollTop = parseInt(savedScroll, 10);
+        }
+      }
+    }
+    restoreLog();
+
+    /* ---------------- AUTO-SAVE ---------------- */
+    function saveLog() {
+      localStorage.setItem("savedLogData", JSON.stringify(logData));
+      localStorage.setItem("savedLogScroll", logContainer.scrollTop);
+    }
+    setInterval(saveLog, 5000);
+
+    /* ---------------- HELPERS ---------------- */
+    function getTimestamp() {
+      const now = new Date();
+      return now.toLocaleDateString() + " " + now.toLocaleTimeString();
+    }
+
+    function addEntryToDOM(entry) {
+      const div = document.createElement("div");
+      div.className = "log-entry";
+
+      const timeEl = document.createElement("div");
+      timeEl.className = "log-time";
+      timeEl.textContent = entry.time;
+      div.appendChild(timeEl);
+
+      if (entry.marker) {
+        const markerEl = document.createElement("div");
+        markerEl.className = "log-marker";
+        markerEl.textContent = "MARKER: " + entry.marker;
+        div.appendChild(markerEl);
+      }
+
+      if (entry.text && entry.text.trim() !== "") {
+        const textEl = document.createElement("div");
+        textEl.className = "log-text";
+        textEl.textContent = entry.text;
+        div.appendChild(textEl);
+      }
+
+      logContainer.appendChild(div);
+    }
+
+    /* ---------------- TIMESTAMP WORKFLOW ---------------- */
+    function createTimestamp() {
+      if (pendingTimestamp !== null) {
+        const text = noteInput.value.trim();
+        const entry = { time: pendingTimestamp, text: text || "" };
+        logData.push(entry);
+        addEntryToDOM(entry);
+        noteInput.value = "";
+        saveLog();
+      }
+
+      pendingTimestamp = getTimestamp();
+      noteInput.focus();
+    }
+
+    timestampButton.addEventListener("click", createTimestamp);
+
+    noteInput.addEventListener("keydown", (e) => {
+      if (e.key === "Enter" && e.ctrlKey) {
+        e.preventDefault();
+        createTimestamp();
+      }
+    });
+
+    /* ---------------- MARKERS ---------------- */
+    function addMarker(markerLabel) {
+      const ts = getTimestamp();
+      const entry = { time: ts, text: "", marker: markerLabel };
+      logData.push(entry);
+      addEntryToDOM(entry);
+      saveLog();
+    }
+
+    markerButtons.forEach(btn => {
+      btn.addEventListener("click", () => {
+        const label = btn.getAttribute("data-marker");
+        addMarker(label);
+      });
+    });
+
+    /* ---------------- RESET LOG ---------------- */
+    resetButton.addEventListener("click", () => {
+      if (!confirm("Clear all logged notes and markers?")) return;
+      logData = [];
+      pendingTimestamp = null;
+      logContainer.innerHTML = "";
+      localStorage.removeItem("savedLogData");
+      localStorage.removeItem("savedLogScroll");
+    });
+
+    /* ---------------- EXPORT CSV ---------------- */
+    exportButton.addEventListener("click", () => {
+      if (logData.length === 0) {
+        alert("No notes to export.");
+        return;
+      }
+      let csv = "timestamp,marker,note\n";
+      logData.forEach(row => {
+        const safeText = (row.text || "").replace(/\"/g, '\"\"');
+        const safeMarker = (row.marker || "").replace(/\"/g, '\"\"');
+        csv += `"${row.time}","${safeMarker}","${safeText}"\n`;
+      });
+      const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "timestamped_notes_with_markers.csv";
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    });
+
+    /* ---------------- SAVE SCROLL POSITION ---------------- */
+    logContainer.addEventListener("scroll", () => {
+      localStorage.setItem("savedLogScroll", logContainer.scrollTop);
+    });
+  </script>
+</body>
+</html>
