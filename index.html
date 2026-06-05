@@ -413,7 +413,28 @@
   <div class="panel">
     <div class="panel-inner">
       <h2>Network view & data</h2>
+<!-- S.I.P. SPONSOR SPOTLIGHT PANEL -->
+<div class="panel">
+  <div class="panel-inner">
+    <h2>Sponsor Spotlight (S.I.P.)</h2>
+    
+    <div class="row" style="margin-bottom: 10px;">
+      <div style="text-align:center"><small>Secured</small><div id="sip-s"></div></div>
+      <div style="text-align:center"><small>In-Progress</small><div id="sip-i"></div></div>
+      <div style="text-align:center"><small>Prospecting</small><div id="sip-p"></div></div>
+    </div>
 
+    <hr style="border:0; border-top:1px solid #334155; margin: 10px 0;">
+    
+    <input type="text" id="sip-name" placeholder="Sponsor name...">
+    <select id="sip-stage">
+      <option value="s">Secured</option>
+      <option value="i">In-Progress</option>
+      <option value="p">Prospecting</option>
+    </select>
+    <button class="btn-primary" style="width:100%; margin-top:8px;" onclick="addSponsor()">Add Sponsor</button>
+  </div>
+</div>
       <div class="toolbar">
         <input type="text" id="search" placeholder="Search name, notes, tags">
         <select id="filter-role">
@@ -804,6 +825,25 @@
   // --- Init ---
   loadFromStorage();
   renderDiagram();
+let pods = [];
+let sponsors = JSON.parse(localStorage.getItem("sip_data") || "[]");
+function addSponsor() {
+  const name = document.getElementById("sip-name").value.trim();
+  const stage = document.getElementById("sip-stage").value;
+  if (!name) return;
+  sponsors.push({ id: Date.now(), name, stage });
+  localStorage.setItem("sip_data", JSON.stringify(sponsors));
+  renderSip();
+}
+
+function renderSip() {
+  const filterSip = (stage) => sponsors.filter(s => s.stage === stage)
+    .map(s => `<div class="card" style="padding:4px; font-size:0.7rem;">${s.name}</div>`).join('');
+  
+  document.getElementById("sip-s").innerHTML = filterSip('s');
+  document.getElementById("sip-i").innerHTML = filterSip('i');
+  document.getElementById("sip-p").innerHTML = filterSip('p');
+}  
 </script>
 
   <footer style="
