@@ -1,207 +1,810 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pod Mapping Network</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Grotesk:wght@500;600&display=swap');
-        
-        body { font-family: 'Inter', system_ui, sans-serif; }
-        .title-font { font-family: 'Space Grotesk', sans-serif; }
+<meta charset="UTF-8">
+<title>Pod Mapping Network</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
 
-        .pod-card {
-            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-        .pod-card:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
-        }
-    </style>
+<style>
+  :root {
+    --primary: #0a5f56;
+    --bg1: #050816;
+    --bg2: #0b2535;
+    --accent: #4fd1c5;
+    --accent-soft: rgba(79, 209, 197, 0.2);
+    --text-main: #f9fafb;
+    --text-muted: #9ca3af;
+
+    --role-care: #22c55e;
+    --role-logistics: #eab308;
+    --role-info: #38bdf8;
+    --role-emotional: #f97373;
+    --role-other: #a855f7;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    padding: 16px;
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    background: radial-gradient(circle at top, #1f2933 0, #020617 55%, #000 100%);
+    color: var(--text-main);
+  }
+
+  h1 {
+    margin: 0 0 4px 0;
+    font-size: 1.6rem;
+    letter-spacing: 0.03em;
+  }
+
+  .subtitle {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    max-width: 720px;
+    margin-bottom: 16px;
+  }
+
+  .layout {
+    display: grid;
+    grid-template-columns: minmax(260px, 320px) 1fr;
+    gap: 16px;
+  }
+
+  @media (max-width: 900px) {
+    .layout {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .panel {
+    background: linear-gradient(145deg, rgba(15,23,42,0.96), rgba(15,23,42,0.85));
+    border-radius: 14px;
+    padding: 14px 16px;
+    box-shadow:
+      0 0 0 1px rgba(148,163,184,0.15),
+      0 18px 45px rgba(15,23,42,0.9);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .panel::before {
+    content: "";
+    position: absolute;
+    inset: -40%;
+    background:
+      radial-gradient(circle at 10% 0%, rgba(56,189,248,0.12), transparent 55%),
+      radial-gradient(circle at 90% 100%, rgba(244,114,182,0.12), transparent 55%);
+    opacity: 0.7;
+    pointer-events: none;
+  }
+
+  .panel-inner {
+    position: relative;
+    z-index: 1;
+  }
+
+  .panel h2 {
+    margin-top: 0;
+    font-size: 0.95rem;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--text-muted);
+  }
+
+  label {
+    font-size: 0.75rem;
+    font-weight: 600;
+    display: block;
+    margin-top: 8px;
+    color: var(--text-muted);
+  }
+
+  input[type="text"],
+  textarea,
+  select {
+    width: 100%;
+    padding: 7px 9px;
+    margin-top: 3px;
+    border-radius: 999px;
+    border: 1px solid rgba(148,163,184,0.5);
+    background: rgba(15,23,42,0.9);
+    color: var(--text-main);
+    font-size: 0.8rem;
+    outline: none;
+  }
+
+  textarea {
+    border-radius: 10px;
+    resize: vertical;
+    min-height: 70px;
+  }
+
+  input::placeholder,
+  textarea::placeholder {
+    color: rgba(148,163,184,0.8);
+  }
+
+  select {
+    appearance: none;
+    background-image: linear-gradient(45deg, transparent 50%, #9ca3af 50%),
+                      linear-gradient(135deg, #9ca3af 50%, transparent 50%);
+    background-position: calc(100% - 14px) 11px, calc(100% - 9px) 11px;
+    background-size: 5px 5px, 5px 5px;
+    background-repeat: no-repeat;
+  }
+
+  .row {
+    display: flex;
+    gap: 8px;
+  }
+
+  .row > div {
+    flex: 1;
+  }
+
+  button {
+    border-radius: 999px;
+    border: none;
+    padding: 7px 12px;
+    font-size: 0.75rem;
+    cursor: pointer;
+    font-weight: 600;
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
+  }
+
+  .btn-primary {
+    background: linear-gradient(135deg, #22c55e, #4ade80);
+    color: #022c22;
+    box-shadow: 0 0 0 1px rgba(34,197,94,0.4), 0 10px 25px rgba(22,163,74,0.6);
+  }
+
+  .btn-secondary {
+    background: rgba(15,23,42,0.9);
+    color: var(--text-main);
+    box-shadow: 0 0 0 1px rgba(148,163,184,0.5);
+  }
+
+  .btn-danger {
+    background: linear-gradient(135deg, #ef4444, #f97373);
+    color: #111827;
+    box-shadow: 0 0 0 1px rgba(248,113,113,0.4), 0 10px 25px rgba(185,28,28,0.7);
+  }
+
+  .btn-small {
+    padding: 4px 9px;
+    font-size: 0.7rem;
+  }
+
+  .btn-group {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 12px;
+  }
+
+  .toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    align-items: center;
+    margin-bottom: 8px;
+  }
+
+  .toolbar input[type="text"],
+  .toolbar select {
+    max-width: 210px;
+  }
+
+  #diagram {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 14px;
+    align-content: flex-start;
+    padding-top: 4px;
+  }
+
+  .pod-bubble {
+    position: relative;
+    width: 190px;
+    height: 190px;
+    border-radius: 50%;
+    padding: 10px;
+    background: radial-gradient(circle at 30% 20%, rgba(255,255,255,0.18), transparent 55%),
+                radial-gradient(circle at 80% 80%, rgba(15,23,42,0.9), rgba(15,23,42,1));
+    box-shadow:
+      0 0 0 1px rgba(148,163,184,0.4),
+      0 0 25px rgba(15,23,42,0.9),
+      0 0 40px rgba(56,189,248,0.18);
+    overflow: hidden;
+    cursor: grab;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+  }
+
+  .pod-bubble:hover {
+    transform: translateY(-3px);
+    box-shadow:
+      0 0 0 1px rgba(148,163,184,0.7),
+      0 0 35px rgba(56,189,248,0.35),
+      0 0 60px rgba(244,114,182,0.25);
+  }
+
+  .pod-bubble::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    border: 2px solid transparent;
+    background:
+      conic-gradient(from 180deg, rgba(56,189,248,0.5), rgba(244,114,182,0.5), rgba(56,189,248,0.5))
+      border-box;
+    mask:
+      radial-gradient(farthest-side, transparent calc(100% - 2px), #000 0);
+    opacity: 0.35;
+    pointer-events: none;
+  }
+
+  .pod-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .pod-avatar {
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    background: radial-gradient(circle at 30% 20%, #f9fafb, #0f172a);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: #020617;
+    box-shadow: 0 0 0 2px rgba(15,23,42,0.9);
+  }
+
+  .pod-title {
+    flex: 1;
+  }
+
+  .pod-title h3 {
+    margin: 0;
+    font-size: 0.9rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .pod-title .role-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 2px 7px;
+    border-radius: 999px;
+    font-size: 0.65rem;
+    margin-top: 2px;
+    background: rgba(15,23,42,0.9);
+    box-shadow: 0 0 0 1px rgba(148,163,184,0.5);
+  }
+
+  .role-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+  }
+
+  .pod-body {
+    font-size: 0.7rem;
+    color: var(--text-muted);
+    margin-top: 4px;
+    max-height: 80px;
+    overflow: hidden;
+  }
+
+  .pod-body strong {
+    color: var(--text-main);
+  }
+
+  .pod-notes {
+    margin-bottom: 4px;
+  }
+
+  .pod-tags {
+    font-size: 0.65rem;
+    color: var(--text-muted);
+  }
+
+  .pod-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.65rem;
+    margin-top: 4px;
+  }
+
+  .pod-controls {
+    display: flex;
+    gap: 4px;
+  }
+
+  .status {
+    font-size: 0.7rem;
+    color: var(--text-muted);
+    margin-top: 8px;
+  }
+
+  input[type="file"] {
+    font-size: 0.7rem;
+  }
+
+  .import-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    cursor: pointer;
+  }
+
+  .import-label input {
+    display: none;
+  }
+</style>
 </head>
-<body class="bg-zinc-950 text-zinc-200">
-    <div class="flex h-screen overflow-hidden">
-        <!-- LEFT PANEL -->
-        <div class="w-96 bg-zinc-900 border-r border-zinc-800 flex flex-col">
-            <div class="p-6 border-b border-zinc-800">
-                <h1 class="text-3xl font-semibold title-font tracking-tight">Pod Mapping Network</h1>
-                <p class="text-zinc-400 text-sm mt-2">Map your care, logistics, information, and emotional support pods.</p>
-            </div>
+<body>
 
-            <div class="p-6 flex-1 overflow-auto">
-                <h2 class="uppercase text-xs tracking-widest text-zinc-500 mb-4">POD MEMBER DETAILS</h2>
-                
-                <form id="podForm" class="space-y-6">
-                    <div>
-                        <label class="block text-xs text-zinc-400 mb-1">Name</label>
-                        <input id="name" type="text" 
-                               class="w-full bg-zinc-800 border border-zinc-700 rounded-xl px-4 py-3 focus:outline-none focus:border-emerald-500"
-                               placeholder="Full Name">
-                    </div>
+<h1>Pod Mapping Network</h1>
+<div class="subtitle">
+  Map your care, logistics, information, and emotional support pods as a living network. Add people, capture notes,
+  and export your map for sharing or archiving. Data stays local until you clear all pods.
+</div>
 
-                    <div>
-                        <label class="block text-xs text-zinc-400 mb-1">Role / Support Lane</label>
-                        <div class="flex gap-2">
-                            <select id="role" class="flex-1 bg-zinc-800 border border-zinc-700 rounded-xl px-4 py-3 focus:outline-none focus:border-emerald-500">
-                                <option value="Information Sharing">Information Sharing</option>
-                                <option value="Emotional Support">Emotional Support</option>
-                                <option value="Logistics">Logistics</option>
-                                <option value="Care">Care</option>
-                                <option value="Housing">Housing</option>
-                            </select>
-                            <input id="customRole" type="text" placeholder="Custom role (optional)"
-                                   class="flex-1 bg-zinc-800 border border-zinc-700 rounded-xl px-4 py-3 focus:outline-none focus:border-emerald-500">
-                        </div>
-                    </div>
+<div class="layout">
+  <!-- LEFT: FORM -->
+  <div class="panel">
+    <div class="panel-inner">
+      <h2>Pod member details</h2>
 
-                    <div>
-                        <label class="block text-xs text-zinc-400 mb-1">Notes</label>
-                        <textarea id="notes" rows="3" class="w-full bg-zinc-800 border border-zinc-700 rounded-2xl px-4 py-3 focus:outline-none focus:border-emerald-500"></textarea>
-                    </div>
+      <input type="hidden" id="pod-id">
 
-                    <div>
-                        <label class="block text-xs text-zinc-400 mb-1">Contact Info</label>
-                        <input id="contact" type="text" 
-                               class="w-full bg-zinc-800 border border-zinc-700 rounded-xl px-4 py-3 focus:outline-none focus:border-emerald-500"
-                               placeholder="Phone or email">
-                    </div>
+      <label for="name">Name</label>
+      <input type="text" id="name" placeholder="Person or group name">
 
-                    <div>
-                        <label class="block text-xs text-zinc-400 mb-1">Tags (comma-separated)</label>
-                        <input id="tags" type="text" 
-                               class="w-full bg-zinc-800 border border-zinc-700 rounded-xl px-4 py-3 focus:outline-none focus:border-emerald-500"
-                               placeholder="Spanish, Housing, etc.">
-                    </div>
-
-                    <div class="flex gap-3 pt-6">
-                        <button onclick="savePod(event)" type="button"
-                                class="flex-1 bg-emerald-500 hover:bg-emerald-600 text-black font-semibold py-4 rounded-2xl flex items-center justify-center gap-2">
-                            <i class="fa-solid fa-plus"></i> SAVE POD
-                        </button>
-                        <button onclick="clearForm()" type="button"
-                                class="flex-1 bg-zinc-800 hover:bg-zinc-700 font-semibold py-4 rounded-2xl">
-                            CLEAR FORM
-                        </button>
-                    </div>
-                </form>
-            </div>
+      <div class="row">
+        <div>
+          <label for="role">Role / support lane</label>
+          <select id="role">
+            <option value="">Select role</option>
+            <option value="care">Care & Well-being</option>
+            <option value="logistics">Logistics / Practical Support</option>
+            <option value="info">Information Sharing</option>
+            <option value="emotional">Emotional & Spiritual Support</option>
+            <option value="other">Other / Custom</option>
+          </select>
         </div>
-
-        <!-- RIGHT SIDE (same as before) -->
-        <div class="flex-1 flex flex-col">
-            <!-- Top bar, Sponsor Spotlight, Network Area, etc. -->
-            <!-- (Kept the same for brevity - full code is below if needed) -->
-            <div class="h-14 border-b border-zinc-800 bg-zinc-900 px-6 flex items-center justify-between">
-                <div class="flex items-center gap-8">
-                    <div class="flex items-center gap-2 text-emerald-400">
-                        <i class="fa-solid fa-network-wired"></i>
-                        <span class="font-medium">Network View &amp; Data</span>
-                    </div>
-                </div>
-                <div class="flex items-center gap-4">
-                    <button onclick="exportJSON()" class="px-4 py-1.5 text-xs font-medium bg-zinc-800 hover:bg-zinc-700 rounded-xl">↓ JSON</button>
-                    <button onclick="exportCSV()" class="px-4 py-1.5 text-xs font-medium bg-zinc-800 hover:bg-zinc-700 rounded-xl">↓ CSV</button>
-                    <button onclick="clearAllPods()" class="px-4 py-1.5 text-xs font-medium bg-red-500/10 hover:bg-red-500/20 text-red-400 rounded-xl">CLEAR ALL PODS</button>
-                </div>
-            </div>
-
-            <div class="flex-1 p-6 overflow-auto bg-zinc-950" id="networkArea">
-                <div id="podsContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"></div>
-            </div>
+        <div>
+          <label for="custom-role">Custom role (optional)</label>
+          <input type="text" id="custom-role" placeholder="e.g., Neighbor with tools">
         </div>
+      </div>
+
+      <label for="notes">Notes</label>
+      <textarea id="notes" placeholder="What kind of support? Boundaries? Best ways to engage?"></textarea>
+
+      <label for="contact">Contact info</label>
+      <input type="text" id="contact" placeholder="Phone, email, handle, or 'via neighbor'">
+
+      <label for="tags">Tags (comma-separated)</label>
+      <input type="text" id="tags" placeholder="e.g., car, childcare, night-shift, Spanish">
+
+      <div class="btn-group">
+        <button class="btn-primary" id="save-btn">Save pod</button>
+        <button class="btn-secondary" id="reset-btn" type="button">Clear form</button>
+      </div>
+
+      <div class="status" id="form-status"></div>
     </div>
+  </div>
 
-    <script>
-        let pods = JSON.parse(localStorage.getItem('pods')) || [];
+  <!-- RIGHT: DIAGRAM + TOOLS -->
+  <div class="panel">
+    <div class="panel-inner">
+      <h2>Network view & data</h2>
 
-        function renderPods() {
-            const container = document.getElementById('podsContainer');
-            container.innerHTML = pods.length === 0 ? `
-                <div class="col-span-full h-96 flex flex-col items-center justify-center text-center text-zinc-400">
-                    <i class="fa-solid fa-network-wired text-6xl mb-6 opacity-30"></i>
-                    <p class="text-xl">Your network is empty</p>
-                    <p class="text-sm mt-2">Add pod members using the form on the left</p>
-                </div>` : '';
+      <div class="toolbar">
+        <input type="text" id="search" placeholder="Search name, notes, tags">
+        <select id="filter-role">
+          <option value="">All roles</option>
+          <option value="care">Care & Well-being</option>
+          <option value="logistics">Logistics / Practical Support</option>
+          <option value="info">Information Sharing</option>
+          <option value="emotional">Emotional & Spiritual Support</option>
+          <option value="other">Other / Custom</option>
+        </select>
+        <button class="btn-secondary btn-small" id="clear-filters" type="button">Clear filters</button>
+      </div>
 
-            pods.forEach((pod, i) => {
-                const div = document.createElement('div');
-                div.className = "pod-card bg-zinc-900 border border-zinc-700 rounded-3xl overflow-hidden";
-                div.innerHTML = `
-                    <div class="p-5">
-                        <div class="flex justify-between">
-                            <div>
-                                <div class="font-semibold">${pod.name}</div>
-                                <div class="text-emerald-400 text-sm">${pod.role}</div>
-                            </div>
-                            <button onclick="deletePod(${i}); event.stopImmediatePropagation()" class="text-zinc-500 hover:text-red-400">
-                                <i class="fa-solid fa-trash"></i>
-                            </button>
-                        </div>
-                        ${pod.notes ? `<div class="mt-3 text-sm text-zinc-400">${pod.notes}</div>` : ''}
-                    </div>
-                    <div class="bg-zinc-950 border-t border-zinc-800 p-4 text-xs flex justify-between items-center">
-                        <span>${pod.contact || '—'}</span>
-                        <button onclick="connectPod(${i}); event.stopImmediatePropagation()" class="text-emerald-400 hover:text-white">CONNECT</button>
-                    </div>
-                `;
-                container.appendChild(div);
-            });
+      <div class="toolbar">
+        <button class="btn-secondary btn-small" id="export-json" type="button">Download JSON</button>
+        <button class="btn-secondary btn-small" id="export-csv" type="button">Download CSV</button>
+
+        <label class="btn-secondary btn-small import-label">
+          Import JSON
+          <input type="file" id="import-json" accept=".json">
+        </label>
+
+        <button class="btn-danger btn-small" id="clear-all" type="button">Clear all pods</button>
+      </div>
+
+      <div id="diagram"></div>
+
+      <div class="status" id="storage-status"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+  // --- Data model & storage ---
+  let pods = [];
+  const STORAGE_KEY = "pod_mapping_network_v1";
+
+  function roleColor(role) {
+    switch (role) {
+      case "care": return "var(--role-care)";
+      case "logistics": return "var(--role-logistics)";
+      case "info": return "var(--role-info)";
+      case "emotional": return "var(--role-emotional)";
+      case "other": return "var(--role-other)";
+      default: return "var(--accent)";
+    }
+  }
+
+  function roleLabel(role) {
+    switch (role) {
+      case "care": return "Care & Well-being";
+      case "logistics": return "Logistics / Practical Support";
+      case "info": return "Information Sharing";
+      case "emotional": return "Emotional & Spiritual Support";
+      case "other": return "Other / Custom";
+      default: return "Unspecified";
+    }
+  }
+
+  function saveToStorage() {
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(pods));
+      document.getElementById("storage-status").textContent =
+        "Autosaved (" + new Date().toLocaleTimeString() + ")";
+    } catch (e) {
+      document.getElementById("storage-status").textContent =
+        "Could not save to browser storage.";
+    }
+  }
+
+  function loadFromStorage() {
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if (!raw) return;
+      const parsed = JSON.parse(raw);
+      if (Array.isArray(parsed)) {
+        pods = parsed;
+      }
+    } catch (e) {
+      console.warn("Failed to load pods from storage", e);
+    }
+  }
+
+  // --- Rendering ---
+  function renderDiagram() {
+    const diagram = document.getElementById("diagram");
+    diagram.innerHTML = "";
+
+    const search = document.getElementById("search").value.toLowerCase().trim();
+    const filterRole = document.getElementById("filter-role").value;
+
+    const filtered = pods.filter(p => {
+      if (filterRole && p.role !== filterRole) return false;
+      if (!search) return true;
+      const haystack = [
+        p.name || "",
+        p.notes || "",
+        p.contact || "",
+        (p.tags || []).join(", "),
+        p.customRole || ""
+      ].join(" ").toLowerCase();
+      return haystack.includes(search);
+    });
+
+    filtered.forEach(p => {
+      const bubble = document.createElement("div");
+      bubble.className = "pod-bubble";
+      bubble.draggable = true;
+      bubble.dataset.id = p.id;
+
+      const initials = (p.name || "?")
+        .split(" ")
+        .filter(Boolean)
+        .slice(0, 2)
+        .map(s => s[0].toUpperCase())
+        .join("");
+
+      bubble.innerHTML = `
+        <div class="pod-header">
+          <div class="pod-avatar" style="box-shadow:0 0 0 2px ${roleColor(p.role)};">
+            ${initials || "?"}
+          </div>
+          <div class="pod-title">
+            <h3>${p.name || "(Unnamed)"}</h3>
+            <div class="role-pill">
+              <span class="role-dot" style="background:${roleColor(p.role)};"></span>
+              <span>${roleLabel(p.role)}</span>
+            </div>
+          </div>
+        </div>
+        <div class="pod-body">
+          <div class="pod-notes">${(p.notes || "").replace(/\n/g, "<br>")}</div>
+          <div><strong>Contact:</strong> ${p.contact || "—"}</div>
+          <div class="pod-tags">
+            ${p.tags && p.tags.length ? "<strong>Tags:</strong> " + p.tags.join(", ") : ""}
+          </div>
+        </div>
+        <div class="pod-footer">
+          <span>${p.customRole ? p.customRole : ""}</span>
+          <div class="pod-controls">
+            <button class="btn-secondary btn-small" data-action="edit">Edit</button>
+            <button class="btn-danger btn-small" data-action="delete">Delete</button>
+          </div>
+        </div>
+      `;
+
+      // Drag & drop ordering
+      bubble.addEventListener("dragstart", handleDragStart);
+      bubble.addEventListener("dragover", handleDragOver);
+      bubble.addEventListener("drop", handleDrop);
+
+      // Edit / delete
+      bubble.addEventListener("click", (e) => {
+        const action = e.target.dataset.action;
+        if (!action) return;
+        if (action === "edit") {
+          loadIntoForm(p.id);
+        } else if (action === "delete") {
+          if (confirm("Remove this pod member from the map?")) {
+            pods = pods.filter(x => x.id !== p.id);
+            saveToStorage();
+            renderDiagram();
+          }
         }
+      });
 
-        function savePod(e) {
-            e.preventDefault();
-            const name = document.getElementById('name').value.trim();
-            if (!name) return alert("Name is required");
+      diagram.appendChild(bubble);
+    });
 
-            pods.unshift({
-                id: Date.now(),
-                name: name,
-                role: document.getElementById('role').value,
-                notes: document.getElementById('notes').value.trim(),
-                contact: document.getElementById('contact').value.trim(),
-                tags: document.getElementById('tags').value.trim()
-            });
+    if (!filtered.length) {
+      const empty = document.createElement("div");
+      empty.style.fontSize = "0.8rem";
+      empty.style.color = "var(--text-muted)";
+      empty.textContent = pods.length
+        ? "No pods match the current filters."
+        : "No pods yet. Add your first pod member on the left.";
+      diagram.appendChild(empty);
+    }
+  }
 
-            localStorage.setItem('pods', JSON.stringify(pods));
-            renderPods();
-            clearForm();
-            showToast(`${name} added to network`);
+  // --- Drag & drop reordering ---
+  let dragSourceId = null;
+
+  function handleDragStart(e) {
+    dragSourceId = e.currentTarget.dataset.id;
+    e.dataTransfer.effectAllowed = "move";
+  }
+
+  function handleDragOver(e) {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = "move";
+  }
+
+  function handleDrop(e) {
+    e.preventDefault();
+    const targetId = e.currentTarget.dataset.id;
+    if (!dragSourceId || dragSourceId === targetId) return;
+
+    const fromIndex = pods.findIndex(p => String(p.id) === String(dragSourceId));
+    const toIndex = pods.findIndex(p => String(p.id) === String(targetId));
+    if (fromIndex === -1 || toIndex === -1) return;
+
+    const [moved] = pods.splice(fromIndex, 1);
+    pods.splice(toIndex, 0, moved);
+
+    saveToStorage();
+    renderDiagram();
+  }
+
+  // --- Form handling ---
+  function clearForm() {
+    document.getElementById("pod-id").value = "";
+    document.getElementById("name").value = "";
+    document.getElementById("role").value = "";
+    document.getElementById("custom-role").value = "";
+    document.getElementById("notes").value = "";
+    document.getElementById("contact").value = "";
+    document.getElementById("tags").value = "";
+    document.getElementById("form-status").textContent = "";
+  }
+
+  function loadIntoForm(id) {
+    const pod = pods.find(p => p.id === id);
+    if (!pod) return;
+    document.getElementById("pod-id").value = pod.id;
+    document.getElementById("name").value = pod.name || "";
+    document.getElementById("role").value = pod.role || "";
+    document.getElementById("custom-role").value = pod.customRole || "";
+    document.getElementById("notes").value = pod.notes || "";
+    document.getElementById("contact").value = pod.contact || "";
+    document.getElementById("tags").value = (pod.tags || []).join(", ");
+    document.getElementById("form-status").textContent = "Editing existing pod.";
+  }
+
+  function savePodFromForm() {
+    const idField = document.getElementById("pod-id").value;
+    const name = document.getElementById("name").value.trim();
+    const role = document.getElementById("role").value;
+    const customRole = document.getElementById("custom-role").value.trim();
+    const notes = document.getElementById("notes").value.trim();
+    const contact = document.getElementById("contact").value.trim();
+    const tagsRaw = document.getElementById("tags").value.trim();
+    const tags = tagsRaw ? tagsRaw.split(",").map(t => t.trim()).filter(Boolean) : [];
+
+    if (!name) {
+      document.getElementById("form-status").textContent = "Name is required.";
+      return;
+    }
+
+    if (idField) {
+      const idx = pods.findIndex(p => String(p.id) === String(idField));
+      if (idx !== -1) {
+        pods[idx] = {
+          ...pods[idx],
+          name,
+          role,
+          customRole,
+          notes,
+          contact,
+          tags
+        };
+      }
+      document.getElementById("form-status").textContent = "Pod updated.";
+    } else {
+      const newPod = {
+        id: Date.now().toString(),
+        name,
+        role,
+        customRole,
+        notes,
+        contact,
+        tags
+      };
+      pods.push(newPod);
+      document.getElementById("form-status").textContent = "Pod added.";
+    }
+
+    saveToStorage();
+    renderDiagram();
+    clearForm();
+  }
+
+  // --- Export / import ---
+  function downloadFile(filename, content, type = "application/json") {
+    const blob = new Blob([content], { type });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  }
+
+  function exportJSON() {
+    const content = JSON.stringify(pods, null, 2);
+    downloadFile("pod_mapping_network.json", content, "application/json");
+  }
+
+  function exportCSV() {
+    const header = [
+      "id",
+      "name",
+      "role",
+      "customRole",
+      "notes",
+      "contact",
+      "tags"
+    ];
+    const rows = pods.map(p => {
+      const escape = (val) => {
+        if (val == null) return "";
+        const s = String(val).replace(/"/g, '""');
+        return `"${s}"`;
+      };
+      return [
+        escape(p.id),
+        escape(p.name),
+        escape(roleLabel(p.role)),
+        escape(p.customRole || ""),
+        escape(p.notes || ""),
+        escape(p.contact || ""),
+        escape((p.tags || []).join(", "))
+      ].join(",");
+    });
+    const csv = [header.join(","), ...rows].join("\n");
+    downloadFile("pod_mapping_network.csv", csv, "text/csv");
+  }
+
+  function importJSONFile(file) {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      try {
+        const data = JSON.parse(e.target.result);
+        if (!Array.isArray(data)) {
+          alert("Invalid JSON format: expected an array.");
+          return;
         }
+        pods = data;
+        saveToStorage();
+        renderDiagram();
+      } catch (err) {
+        alert("Could not parse JSON file.");
+      }
+    };
+    reader.readAsText(file);
+  }
 
-        function clearForm() {
-            document.getElementById('podForm').reset();   // Reset all fields
-            // Extra safety to ensure name is cleared
-            document.getElementById('name').value = '';
-        }
+  // --- Event wiring ---
+  document.getElementById("save-btn").addEventListener("click", (e) => {
+    e.preventDefault();
+    savePodFromForm();
+  });
 
-        function deletePod(i) {
-            if (confirm("Delete this pod?")) {
-                pods.splice(i, 1);
-                localStorage.setItem('pods', JSON.stringify(pods));
-                renderPods();
-            }
-        }
+  document.getElementById("reset-btn").addEventListener("click", (e) => {
+    e.preventDefault();
+    clearForm();
+  });
 
-        function showToast(msg) {
-            const toast = document.createElement('div');
-            toast.className = "fixed bottom-6 right-6 bg-zinc-800 border border-emerald-500 text-emerald-400 px-6 py-3 rounded-2xl shadow-xl";
-            toast.textContent = msg;
-            document.body.appendChild(toast);
-            setTimeout(() => toast.remove(), 2500);
-        }
+  document.getElementById("search").addEventListener("input", renderDiagram);
+  document.getElementById("filter-role").addEventListener("change", renderDiagram);
 
-        function clearAllPods() {
-            if (confirm("Clear ALL pods?")) {
-                pods = [];
-                localStorage.clear();
-                renderPods();
-            }
-        }
+  document.getElementById("clear-filters").addEventListener("click", () => {
+    document.getElementById("search").value = "";
+    document.getElementById("filter-role").value = "";
+    renderDiagram();
+  });
 
-        // Initialize
-        window.onload = () => renderPods();
-    </script>
+  document.getElementById("export-json").addEventListener("click", exportJSON);
+  document.getElementById("export-csv").addEventListener("click", exportCSV);
+
+  document.getElementById("import-json").addEventListener("change", (e) => {
+    const file = e.target.files[0];
+    if (file) importJSONFile(file);
+    e.target.value = "";
+  });
+
+  document.getElementById("clear-all").addEventListener("click", () => {
+    if (!pods.length) return;
+    if (confirm("Clear all pods from this map? This cannot be undone.")) {
+      pods = [];
+      saveToStorage();
+      renderDiagram();
+    }
+  });
+
+  // --- Init ---
+  loadFromStorage();
+  renderDiagram();
+</script>
+
 </body>
 </html>
